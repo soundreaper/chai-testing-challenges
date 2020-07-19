@@ -22,43 +22,91 @@ after((done) => {
   mongoose.models = {}
   mongoose.modelSchemas = {}
   mongoose.connection.close()
-  done()
+  done();
 })
 
 
 describe('Message API endpoints', () => {
     beforeEach((done) => {
-        // TODO: add any beforeEach code here
-        done()
+        const test = new Message({
+            title: "test", 
+            body: "testing",
+            author: "tester",
+            _id: testID
+        })
+        test.save()
+        done();
     })
 
     afterEach((done) => {
-        // TODO: add any afterEach code here
+        Message.deleteOne({ _id: testID })
         done()
     })
 
     it('should load all messages', (done) => {
-        // TODO: Complete this
-        done()
+        chai.request(app)
+            .get('/')
+            .end((err, res) => {
+                if (err) done(err);
+                expect(res).to.have.status(200);
+                expect(res.body.msgs).to.be.an('array');
+                done();
+            })
     })
 
     it('should get one specific message', (done) => {
-        // TODO: Complete this
-        done()
+        chai.request(app)
+            .get(`/${testID}}`)
+            .end((err, res) => {
+                if (err) done(err);
+                expect(res).to.have.status(200);
+                expect(res.body.title).to.equal('test');
+                expect(res.body.body).to.equal('testing');
+                expect(res.body.author).to.equal('tester');
+                done();
+            });
     })
 
     it('should post a new message', (done) => {
-        // TODO: Complete this
-        done()
+        chai.request(app)
+            .post('/')
+            .send({title: 'why bears are cool', body: 'because they are', author: 'kuma-kun'})
+            .end((err, res) => {
+                if (err) done(err);
+                expect(res).to.have.status(200);
+                expect(res.body.title).to.equal('why bears are cool');
+                expect(res.body.body).to.equal('because they are');
+                expect(res.body.author).to.equal('kuma-kun');
+                done();
+            })
     })
 
     it('should update a message', (done) => {
-        // TODO: Complete this
-        done()
+        chai.request(app)
+            .put(`/${testID}}`)
+            .send({title: 'no test'})
+            .end((err, res) => {
+                if (err) done(err);
+                expect(res).to.have.status(200);
+                expect(res.body.title).to.equal('no test');
+                expect(res.body.body).to.equal('testing');
+                expect(res.body.author).to.equal('tester');
+                done();
+            })
     })
 
     it('should delete a message', (done) => {
-        // TODO: Complete this
-        done()
+        chai.request(app)
+            .delete(`/messages/${testID}}`)
+            .send({title: 'no test'})
+            .end((err, res) => {
+                if (err) done(err);
+                expect(res.body.message).to.equal('Message deleted');
+                
+                Message.findOne({ title: 'test' }).then((msg) => {
+                    expect(msg).to.equal(null);
+                    done();
+                })
+            })
     })
 })
